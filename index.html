@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>허구의 봄 - 공식 홈페이지</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        /* === 공통 변수 및 테마 === */
+        :root {
+            --bg-gradient-1: #ffd1dc;
+            --bg-gradient-2: #ffe4e1;
+            --bg-gradient-3: #fdfcf0;
+            --text-main: #3d3b38;
+            --text-light: #7a7571;
+            --accent-pink: #f08080;
+            --glass-bg: rgba(255, 255, 255, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --font-serif: 'Noto Serif KR', serif;
+            --font-sans: 'Noto Sans KR', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-serif); color: var(--text-main);
+            overflow: hidden;
+            width: 100vw; height: 100vh; height: 100dvh;
+            background: linear-gradient(120deg, var(--bg-gradient-1), var(--bg-gradient-2), var(--bg-gradient-3));
+            background-size: 200% 200%;
+            animation: gradientMove 15s ease infinite;
+            -webkit-text-size-adjust: none;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .petal {
+            position: absolute; background: #fff; border-radius: 15px 0 15px 0;
+            opacity: 0.7; box-shadow: 0 0 10px rgba(255,255,255,0.5);
+            pointer-events: none; z-index: 1;
+            animation: fall linear infinite, sway ease-in-out infinite alternate;
+        }
+        @keyframes fall { to { top: 110vh; transform: rotate(720deg); } }
+        @keyframes sway { from { margin-left: -30px; } to { margin-left: 30px; } }
+
+        /* === 상단 네비게이션 탭 === */
+        #navbar {
+            position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
+            display: flex; justify-content: center; gap: 1rem; padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border); box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+        .nav-btn {
+            background: none; border: none; font-family: var(--font-sans); font-size: 0.95rem;
+            font-weight: 700; color: var(--text-light); cursor: pointer; letter-spacing: 0.05em;
+            transition: all 0.3s ease; position: relative; padding: 5px; white-space: nowrap;
+        }
+        .nav-btn::after {
+            content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 0; height: 2px; background: var(--accent-pink); transition: width 0.3s ease;
+        }
+        .nav-btn:hover { color: var(--accent-pink); }
+        .nav-btn.active { color: var(--accent-pink); }
+        .nav-btn.active::after { width: 100%; }
+
+        /* === 탭 콘텐츠 컨테이너 === */
+        .tab-content {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 90px 20px 20px;
+            display: flex; flex-direction: column; justify-content: flex-start; align-items: center;
+            opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s;
+            z-index: 10; overflow-y: auto; -webkit-overflow-scrolling: touch;
+        }
+        #tab-intro { justify-content: center; padding-top: 20px;}
+        
+        .tab-content.active { opacity: 1; visibility: visible; }
+        .tab-content::-webkit-scrollbar { width: 4px; }
+        .tab-content::-webkit-scrollbar-thumb { background: rgba(240, 128, 128, 0.4); border-radius: 2px; }
+
+        .glass-card {
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border); border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(255, 182, 193, 0.2);
+            padding: 2.5rem; width: 100%; max-width: 800px; margin-bottom: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        /* === 1. 입부 신청서 (Intro) === */
+        .main-title { font-size: clamp(2.5rem, 7vw, 5rem); font-weight: 700; letter-spacing: 0.1em; color: var(--text-main); margin-bottom: 1rem; text-shadow: 2px 2px 10px rgba(255,255,255,0.8); text-align: center; }
+        .logline { font-size: 1.3rem; font-style: italic; line-height: 1.6; text-align: center; color: #555; word-break: keep-all; }
+        .highlight { color: var(--accent-pink); font-weight: 700; font-size: 1.1em;}
+
+        /* === 2. 동아리 설명 (About) === */
+        .about-card { padding: 3rem 2rem; }
+        .about-header { text-align: center; margin-bottom: 2.5rem; }
+        .sub-heading { font-family: var(--font-sans); font-size: 0.85rem; color: var(--accent-pink); letter-spacing: 0.2em; font-weight: 700; display: block; margin-bottom: 0.8rem; }
+        .section-title.about-title { font-size: clamp(1.6rem, 5vw, 2.2rem); font-weight: 700; line-height: 1.4; color: var(--text-main); letter-spacing: 0.02em; margin-bottom: 0; word-break: keep-all; }
+        .about-body { text-align: center; margin-bottom: 3rem; }
+        .about-text { font-family: var(--font-serif); font-size: clamp(1rem, 4vw, 1.1rem); line-height: 2; color: #4a4643; word-break: keep-all; }
+        .deco-line { width: 30px; height: 1px; background: rgba(240, 128, 128, 0.4); margin: 2rem auto; }
+        .rule-box { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(240, 128, 128, 0.25); border-radius: 10px; padding: 2rem 1.5rem; text-align: center; }
+        .rule-title { font-family: var(--font-sans); font-size: 0.9rem; color: var(--accent-pink); font-weight: 700; letter-spacing: 0.15em; margin-bottom: 0.8rem; }
+        .rule-desc { font-size: clamp(1.1rem, 4vw, 1.25rem); line-height: 1.7; color: var(--text-main); font-style: italic; word-break: keep-all; }
+        .rule-sub { display: block; margin-top: 0.8rem; font-size: 0.85rem; color: var(--text-light); font-family: var(--font-sans); }
+
+        /* === 3. 캐릭터 설명 (Characters) === */
+        #tab-char .glass-card { display: flex; gap: 2rem; align-items: center; max-width: 850px; }
+        .char-img-백 {
+            flex: 0 0 220px; height: 320px; 
+            background-color: rgba(255,255,255,0.4);
+            border: 1px solid rgba(240, 128, 128, 0.3); border-radius: 8px;
+            background-image: url('https://d394jeh9729epj.cloudfront.net/8Onw9pkbiE0-KKKOM0RLQlo5/154bd27f-88ca-488d-b6cb-3c8abf06c456.png');
+            background-size: cover; background-position: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .char-info { flex: 1; }
+        .char-role { font-family: var(--font-sans); font-size: 0.85rem; color: var(--accent-pink); font-weight: 700; letter-spacing: 0.15em; margin-bottom: 0.4rem; }
+        .char-name { font-size: clamp(2rem, 6vw, 2.5rem); font-weight: 700; margin-bottom: 0.8rem; color: var(--text-main); }
+        .char-quote { font-size: clamp(1rem, 4vw, 1.1rem); font-style: italic; color: #5a5a5a; margin-bottom: 1.2rem; border-left: 2px solid var(--accent-pink); padding-left: 0.8rem; word-break: keep-all; }
+        .char-desc { font-family: var(--font-sans); font-size: 0.95rem; line-height: 1.8; color: #555; word-break: keep-all; }
+
+        /* === 💡 4. 일정표 (Schedule) - 호버 효과 강화 === */
+        .schedule-title { text-align: center; font-size: 1.8rem; font-weight: 700; color: var(--accent-pink); letter-spacing: 0.05em; margin-top: 1.5rem; margin-bottom: 2rem; }
+        .schedule-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem; width: 100%; max-width: 1000px; padding-bottom: 4rem;
+        }
+        .season-card {
+            background: var(--glass-bg); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.8rem; text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 바운스 느낌의 애니메이션 */
+            cursor: default;
+        }
+        
+        /* 마우스 호버 효과 다시 적용 */
+        .season-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 15px 35px rgba(240, 128, 128, 0.3);
+            border-color: var(--accent-pink);
+        }
+
+        .season-icon { font-size: 2.2rem; margin-bottom: 0.8rem; transition: transform 0.3s ease; }
+        .season-card:hover .season-icon { transform: scale(1.2) rotate(10deg); }
+
+        .event-list { list-style: none; padding: 0; margin-top: 1.2rem; }
+        .event-item { margin-bottom: 1rem; border-bottom: 1px dashed rgba(0,0,0,0.08); padding-bottom: 0.8rem; transition: background 0.3s; border-radius: 4px; }
+        .event-item:hover { background: rgba(240, 128, 128, 0.05); }
+        .event-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .event-date { font-family: var(--font-sans); font-size: 0.85rem; color: var(--accent-pink); font-weight: 700; margin-bottom: 0.2rem; letter-spacing: 0.03em; }
+        .event-title { font-size: 1.15rem; font-weight: 700; color: var(--text-main); word-break: keep-all; }
+
+        /* === BGM 컨트롤러 === */
+        #bgm-controller {
+            position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+            background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            padding: 8px 15px; border-radius: 50px; border: 1px solid var(--glass-border);
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2); transition: transform 0.3s;
+        }
+        .bgm-btn { background: none; border: none; font-size: 1rem; color: var(--text-main); cursor: pointer; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; }
+        input[type="range"] { -webkit-appearance: none; width: 60px; height: 3px; background: rgba(0,0,0,0.1); border-radius: 2px; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; background: var(--accent-pink); border-radius: 50%; cursor: pointer; }
+        .bgm-label { font-family: var(--font-sans); font-size: 0.65rem; color: var(--text-light); letter-spacing: 0.05em; font-weight: 700;}
+        .lyrics-toggle-btn { font-family: var(--font-sans); font-size: 0.75rem; font-weight: 700; color: var(--accent-pink); background: rgba(255,255,255,0.8); border: 1px solid var(--accent-pink); padding: 3px 10px; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+
+        /* === 가사 모달창 === */
+        #lyrics-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(253, 252, 240, 0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 2000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: opacity 0.4s ease, visibility 0.4s; padding: 20px; }
+        #lyrics-modal.show { opacity: 1; visibility: visible; }
+        .lyrics-content { background: rgba(255, 255, 255, 0.9); border: 1px solid var(--glass-border); border-radius: 12px; box-shadow: 0 10px 40px rgba(240, 128, 128, 0.15); padding: 2.5rem 1.5rem; width: 100%; max-width: 480px; max-height: 80vh; overflow-y: auto; position: relative; text-align: center; transform: translateY(15px); transition: transform 0.4s ease; }
+        #lyrics-modal.show .lyrics-content { transform: translateY(0); }
+        .close-lyrics { position: absolute; top: 12px; right: 15px; background: none; border: none; font-size: 1.8rem; color: var(--text-light); cursor: pointer; }
+        .lyrics-text { font-family: var(--font-serif); font-size: 1rem; line-height: 2; color: #4a4643; margin-top: 0.5rem; margin-bottom: 1.5rem; }
+        .song-by { display: block; margin-top: 2.5rem; font-family: var(--font-sans); font-size: 0.85rem; color: var(--accent-pink); font-weight: 700; letter-spacing: 0.02em; }
+
+        /* === 완벽 모바일 대응 === */
+        @media (max-width: 768px) {
+            #navbar { padding: 0.8rem; gap: 5px; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: flex-start;}
+            #navbar::-webkit-scrollbar { display: none; }
+            .nav-btn { font-size: 0.85rem; padding: 5px 3px; }
+            .tab-content { padding-top: 80px; padding-left: 15px; padding-right: 15px; }
+            .glass-card { padding: 2rem 1.2rem; }
+            .section-title.about-title { font-size: 1.6rem; }
+            .about-card { padding: 2rem 1rem; }
+            .rule-box { padding: 1.5rem 1rem; }
+            #tab-char .glass-card { flex-direction: column; text-align: center; padding: 2rem 1.2rem; gap: 1.5rem;}
+            .char-img-백 { width: 100%; max-width: 200px; height: 280px; flex: none; }
+            .char-quote { border-left: none; border-bottom: 1px solid var(--accent-pink); padding-left: 0; padding-bottom: 0.8rem; margin-bottom: 1rem; }
+            .schedule-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .schedule-title { font-size: 1.6rem; margin-top: 1rem; }
+            #bgm-controller { bottom: 15px; right: 15px; padding: 6px 12px; gap: 8px; }
+            input[type="range"] { width: 45px; }
+            .season-card:hover { transform: translateY(-5px); } /* 모바일은 호버 이동 반경 축소 */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="petal-container"></div>
+
+    <audio id="bgm-audio" src="https://github.com/ijayeochan-cell/crak-jayeo/raw/refs/heads/main/spring%20theme.mp3" loop autoplay></audio>
+    <div id="bgm-controller">
+        <div class="bgm-label">BGM</div>
+        <button id="play-btn" class="bgm-btn">❚❚</button>
+        <input type="range" id="vol-bar" value="0.2" min="0" max="1" step="0.01">
+        <button id="lyrics-btn" class="lyrics-toggle-btn">가사</button>
+    </div>
+
+    <div id="lyrics-modal">
+        <div class="lyrics-content">
+            <button id="close-lyrics" class="close-lyrics">&times;</button>
+            <div class="lyrics-text">
+                햇살이 비스듬히 맴도는 오후의 창가<br>
+                무심코 들어 올린 낡은 카메라<br>
+                렌즈 너머로 습관처럼 널 찾지만<br>
+                남아있는 건 빛바랜 먼지와 나뿐이야<br><br>
+                초점을 맞출수록 자꾸 흐릿해지는 건<br>
+                너의 미소일까, 바보 같은 내 눈물일까<br>
+                따스한 봄바람이 코끝을 스치면<br>
+                꾹 참았던 그리움이 왈칵 쏟아질 것 같아<br><br>
+                닿을 수 없이 멀어진 너의 등 뒤로<br>
+                바보처럼 또 피어나는 벚꽃비가 내려와<br>
+                렌즈를 닫아도 내 안에 새겨진 넌<br>
+                여전히 가장 아프고 예쁜 색으로 남아있어<br><br>
+                함께 걷던 언덕길에 물드는 오렌지빛<br>
+                길어진 그림자엔 네가 없는데<br>
+                소리 내어 그 시간을 멈춰보려 해도<br>
+                초침은 잔인하게 내일을 향해 흘러가<br><br>
+                버리지 못해 쌓아둔 사진 속의 우린<br>
+                이렇게나 눈부시게 웃고 있는데<br>
+                왜 내 곁엔 차가운 계절만 남은 걸까<br><br>
+                닿을 수 없이 멀어진 너의 등 뒤로<br>
+                바보처럼 또 피어나는 벚꽃비가 내려와<br>
+                렌즈를 닫아도 내 안에 새겨진 넌<br>
+                여전히 가장 아프고 예쁜 색으로 남아있어<br><br>
+                차라리 널 만나지 않았더라면 좋았을까?<br><br>
+                널 앓았던 그 시린 봄날마저 사랑했어<br>
+                단 한 장의 필름에 영원을 묶어둘 수 있다면<br><br>
+                닿을 수 없이 멀어진 너의 등 뒤로<br>
+                바보처럼 또 피어나는 벚꽃비가 내려와<br>
+                렌즈를 닫아도 내 안에 새겨진 넌<br>
+                <span class="song-by">song by. 류지안</span>
+            </div>
+        </div>
+    </div>
+
+    <nav id="navbar">
+        <button class="nav-btn active" onclick="showTab('tab-intro')">동아리 입부서</button>
+        <button class="nav-btn" onclick="showTab('tab-about')">동아리 설명</button>
+        <button class="nav-btn" onclick="showTab('tab-char')">등장인물</button>
+        <button class="nav-btn" onclick="showTab('tab-schedule')">연간 일정표</button>
+    </nav>
+
+    <div id="tab-intro" class="tab-content active">
+        <div class="glass-card" style="text-align: center; border: none; box-shadow: none; background: transparent; margin-top: 0;">
+            <h1 class="main-title">허구의 봄</h1>
+            <div class="logline">
+                "여기서 하는 말은 전부 다<br><span class="highlight">'거짓말'</span>이어야 해."
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-about" class="tab-content">
+        <div class="glass-card about-card">
+            <div class="about-header">
+                <span class="sub-heading">About Us</span>
+                <h2 class="section-title about-title">낡은 목조 구교사,<br>빛이 머무는 아늑한 공간</h2>
+            </div>
+            <div class="about-body">
+                <p class="about-text">우리 학교 구교사 가장 깊은 곳. 인적 드문 복도 끝에는 3학년 기장 <strong>'한설백'</strong> 선배가 창설하고 유일한 부원으로 자리를 지키고 있던 <em>비밀스러운 동아리방</em>이 있습니다.</p>
+                <div class="deco-line"></div>
+                <p class="about-text">오래된 나무 바닥의 삐걱임, 먼지 사이로 나른하게 쏟아지는 햇살. 이 기묘한 공간에는 입부와 동시에 지켜야 할 <strong>단 하나의 규칙</strong>이 존재합니다.</p>
+            </div>
+            <div class="rule-box">
+                <div class="rule-title">동아리 절대 규칙</div>
+                <div class="rule-desc">"이 문을 열고 들어온 순간부터, 당신이 하는 모든 말은 <strong>'거짓말'</strong>이어야 합니다."</div>
+                <span class="rule-sub">진심은 철저히 숨길 것.</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-char" class="tab-content">
+        <div class="glass-card">
+            <div class="char-img-백"></div>
+            <div class="char-info">
+                <div class="char-role">동아리 창설자 / 기장 (3학년)</div>
+                <div class="char-name">한설백</div>
+                <div class="char-quote">"찰칵- 방금 네 얼굴 진짜 웃기게 찍혔다. 이것도 다 뻥이야!"</div>
+                <div class="char-desc">단정하고 세련된 분위기를 풍기지만, 언제나 능글맞은 장난으로 진심을 감추는 선배. "거짓말인데?"를 입에 달고 살며, 렌즈 캡이 닫힌 낡은 필름 카메라를 소중히 들고 다닙니다.</div>
+            </div>
+        </div>
+        <div class="glass-card" style="flex-direction: row-reverse;">
+            <div class="char-info" style="text-align: right;">
+                <div class="char-role">유일한 신입 부원 (1학년)</div>
+                <div class="char-name">당신 {user}</div>
+                <div class="char-quote" style="border-left: none; border-right: 2px solid var(--accent-pink); padding-left: 0; padding-right: 0.8rem;">"선배 카메라는 렌즈 캡도 안 열려 있잖아요."</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-schedule" class="tab-content">
+        <h2 class="schedule-title">1년 활동 일정표</h2>
+        <div class="schedule-grid">
+            <div class="season-card">
+                <div class="season-icon">🌸</div>
+                <ul class="event-list">
+                    <li class="event-item"><div class="event-date">3월 2일</div><div class="event-title">입학식</div></li>
+                    <li class="event-item"><div class="event-date">3월 11일</div><div class="event-title">입부 기념 벚꽃 출사</div></li>
+                    <li class="event-item"><div class="event-date">5월 5일</div><div class="event-title">봄소풍</div></li>
+                </ul>
+            </div>
+            <div class="season-card">
+                <div class="season-icon">🌻</div>
+                <ul class="event-list">
+                    <li class="event-item"><div class="event-date">7월 19일</div><div class="event-title">여름방학!</div></li>
+                    <li class="event-item"><div class="event-date">8월 5일</div><div class="event-title">바다 출사</div></li>
+                    <li class="event-item"><div class="event-date">8월 16일</div><div class="event-title">개학 전 동아리실 정비</div></li>
+                </ul>
+            </div>
+            <div class="season-card">
+                <div class="season-icon">🍁</div>
+                <ul class="event-list">
+                    <li class="event-item"><div class="event-date">9월 20일</div><div class="event-title">가을축제 기획 회의</div></li>
+                    <li class="event-item"><div class="event-date">10월 25일</div><div class="event-title">학교 축제 사진전</div></li>
+                </ul>
+            </div>
+            <div class="season-card">
+                <div class="season-icon">❄️</div>
+                <ul class="event-list">
+                    <li class="event-item"><div class="event-date">11월 15일</div><div class="event-title">학교 쉬는날</div></li>
+                    <li class="event-item"><div class="event-date">12월 24일</div><div class="event-title">크리스마스 이브</div></li>
+                    <li class="event-item"><div class="event-date">12월 31일</div><div class="event-title">겨울방학!</div></li>
+                    <li class="event-item"><div class="event-date">2월 10일</div><div class="event-title">졸업식</div></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById(tabId).scrollTop = 0;
+        }
+
+        const audio = document.getElementById('bgm-audio');
+        const playBtn = document.getElementById('play-btn');
+        const volBar = document.getElementById('vol-bar');
+        const lyricsBtn = document.getElementById('lyrics-btn');
+        const lyricsModal = document.getElementById('lyrics-modal');
+        const closeLyrics = document.getElementById('close-lyrics');
+
+        audio.volume = 0.2;
+        let hasPlayed = false;
+
+        audio.play().then(() => { hasPlayed = true; playBtn.innerText = "❚❚"; }).catch(e => { playBtn.innerText = "▶"; });
+        document.body.addEventListener('click', () => { if (!hasPlayed && audio.paused) { audio.play(); hasPlayed = true; playBtn.innerText = "❚❚"; } }, { once: true });
+        playBtn.addEventListener('click', (e) => { e.stopPropagation(); if (audio.paused) { audio.play(); playBtn.innerText = "❚❚"; hasPlayed = true; } else { audio.pause(); playBtn.innerText = "▶"; } });
+        volBar.addEventListener('input', () => { audio.volume = volBar.value; });
+        lyricsBtn.addEventListener('click', (e) => { e.stopPropagation(); lyricsModal.classList.add('show'); });
+        closeLyrics.addEventListener('click', () => { lyricsModal.classList.remove('show'); });
+        lyricsModal.addEventListener('click', (e) => { if(e.target === lyricsModal) lyricsModal.classList.remove('show'); });
+
+        function createPetals() {
+            const container = document.getElementById('petal-container');
+            const petalCount = window.innerWidth <= 768 ? 12 : 20;
+            for (let i = 0; i < petalCount; i++) {
+                let petal = document.createElement('div');
+                petal.classList.add('petal');
+                let size = Math.random() * 10 + 10;
+                petal.style.width = `${size}px`; petal.style.height = `${size}px`;
+                petal.style.left = `${Math.random() * 100}vw`; petal.style.top = `-${Math.random() * 20}vh`;
+                petal.style.animationDuration = `${Math.random() * 5 + 5}s, ${Math.random() * 2 + 2}s`;
+                petal.style.animationDelay = `${Math.random() * 5}s, 0s`;
+                container.appendChild(petal);
+            }
+        }
+        window.onload = createPetals;
+    </script>
+</body>
+</html>
